@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import argparse
+parser = argparse.ArgumentParser(description='Join the lines of each sequence\
+         in a FASTA file.')
+parser.add_argument('file', help="FASTA file to process")
+parser.add_argument('-o', metavar="<str>", default="",
+        help="output path (default: print to stdout)")
+args = parser.parse_args()
+
+# Get lines
+f = open(args.file, "r")
+try:
+    lines = f.readlines()
+finally:
+    f.close()
+lines=["".join(line.split()) for line in lines] # Remove newlines etc.
+
+# Perform joining
+n = 0
+while n < len(lines)-1:
+    if ">" not in lines[n] and ">" not in lines[n+1]:
+        lines[n].replace("\n", "")
+        lines[n] += lines[n+1]
+        del lines[n+1]
+    else:
+        n += 1
+
+# Output
+outstr = "\n".join(lines)+"\n"
+if len(args.o) > 0:
+    outfile=open(args.o, "w")
+    try:
+        outfile.write(outstr)
+    finally:
+        outfile.close()
+else:
+    print(outstr)
